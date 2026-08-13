@@ -57,7 +57,7 @@ use datafusion::{
     execution::{
         DiskManager, FunctionRegistry, SessionStateBuilder,
         disk_manager::DiskManagerMode,
-        memory_pool::{GreedyMemoryPool, TrackConsumersPool},
+        memory_pool::{FairSpillPool, GreedyMemoryPool, TrackConsumersPool},
         object_store::ObjectStoreRegistry,
         runtime_env::{RuntimeEnv, RuntimeEnvBuilder},
     },
@@ -1846,7 +1846,7 @@ fn runtime_env_with_effective_memory_limit_and_object_store_registry(
     let memory_pool = Arc::new(TrackConsumersPool::new(
         // The runtime supports only 64-bit platforms, so casting u64 to usize
         // will not truncate on supported targets.
-        GreedyMemoryPool::new(effective_memory_bytes),
+        FairSpillPool::new(effective_memory_bytes),
         topn,
     ));
 
